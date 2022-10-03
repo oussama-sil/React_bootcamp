@@ -7,15 +7,16 @@ import {
   CardText,
   CardBody,
   CardTitle,
-  List,Breadcrumb, BreadcrumbItem} from "reactstrap";
+  List,Breadcrumb, BreadcrumbItem, Button} from "reactstrap";
 import {Link} from 'react-router-dom';
-
+import CommentForm from "./CommentForm";
 
 class DishDetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
       dish: props.dish,
+
     };
   }
 
@@ -40,6 +41,7 @@ class DishDetail extends Component {
         <div>
           <h4>Comments</h4>
           <List type="unstyled">{commentsElem}</List>
+          <CommentForm />
         </div>
       );
     } else {

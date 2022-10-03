@@ -6,17 +6,22 @@ import Menu from './Components/MenuComponent';
 import  {DISHES} from './Shared/dishes'
 import Main from './Components/MainComponent';
 import { BrowserRouter } from 'react-router-dom';
+import { ConfigureStore } from './Redux/configureStore';
+import { Provider } from 'react-redux';
 var elem = (<h1> hello world </h1>);
+const store = ConfigureStore();
 
 class App extends Component {
-
   render(){
     return (
-      <BrowserRouter>  
-        <div >
-          <Main />
-        </div>
-      </BrowserRouter>
+      <Provider store={store}>  
+        <BrowserRouter>  
+          <div >
+            <Main />
+          </div>
+        </BrowserRouter>
+      </Provider>
+
     );
   }
 }
