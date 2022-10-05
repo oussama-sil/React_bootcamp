@@ -27,8 +27,12 @@ class CommentForm extends Component {
       }
 
       handleSubmit(values) {
-        alert("Form Submitted : " + JSON.stringify(values));
-        console.log(JSON.stringify(values));
+        // this.toggleModel(); //? to close the model
+            console.log("Form Submitted : "+ this.props.dishID+ JSON.stringify(values));
+
+        this.props.postComment(this.props.dishID,values.rating,values.name,values.comment);
+        // alert("Form Submitted : " + JSON.stringify(values));
+        // console.log(JSON.stringify(values));
       }
     
     //   handleLogin(event){
@@ -52,7 +56,7 @@ class CommentForm extends Component {
                                     Rating
                                 </Label>
                                 <Col >
-                                    <Control.select model=".rating" 
+                                    <Control.select model=".rating"     defaultValue={"1"}   // So the object values don't be empty
                                     className="form-control" name="rating">
                                         <option>1</option>
                                         <option>2</option>

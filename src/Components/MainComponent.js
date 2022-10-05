@@ -14,7 +14,12 @@ import About from "./AboutComponent";
 import {Switch, Route,Redirect, withRouter} from 'react-router-dom'
 import Contact from "./ContactComponent";
 import {connect} from 'react-redux'; // connect the main component to the store
+import { postComment,fetchComments,fetchDishes, fetchPromos } from "../Redux/ActionCreators";
+import *  as ActionTypes from '../Redux/ActionTypes';
+import {actions} from 'react-redux-form';
 
+
+//? State is available as props in the main component 
 const mapStateToProps = state =>{
     return { //map to redux store to props
       dishes:state.dishes,
@@ -23,6 +28,28 @@ const mapStateToProps = state =>{
       leaders : state.leaders
     }
 }
+
+
+//? This are dispatches  
+const mapDispatchToProps=(dispatch) =>({
+  fetchDishes : () =>{dispatch(fetchDishes())},
+  postComment: (dishId,rating,author,comment) =>{
+    // console.log(JSON.stringify(addComment(dishID,rating,author,comment)));
+    dispatch(postComment(dishId,rating,author,comment))
+    // dispatch({
+    //   type:ActionTypes.ADD_COMMENT,
+    //         payload: {
+    //             dishID:12,
+    //             rating:5,
+    //             author:"rer",
+    //             comment:"comment"
+    //         }
+    // })
+  },
+  resetFeedbackForm : ()=>dispatch(actions.reset('feedback')),  //* to reset form to initiale state after submit 
+  fetchPromos : () =>{dispatch(fetchPromos())},
+  fetchComments : () =>{dispatch(fetchComments())},
+});
 
 //? Main component takes it's informations from the store
 
@@ -41,6 +68,12 @@ class Main extends Component {
   }
 
 
+  componentDidMount(){ //after the component is mounted 
+    this.props.fetchDishes(); //fetch the data after the comment is mounted 
+    this.props.fetchComments();
+    this.props.fetchPromos();
+  }
+
   onDishSelect(dishID) {
     this.setState({ selectedDish: dishID });
   }
@@ -49,8 +82,13 @@ class Main extends Component {
   render() {
     const HomePage = ()=>{
         return(
-            <Home  dish={this.props.dishes.filter((dish)=>dish.featured)[0]} 
-                promotion={this.props.promotions.filter((prom)=>prom.featured)[0]}
+            <Home 
+                dish={this.props.dishes.dishes.filter((dish)=>dish.featured)[0]} 
+                dishesLoading = {this.props.dishes.isLoading}
+                dishesErrMess={this.props.dishes.errMess}
+                promotion={this.props.promotions.promotions.filter((prom)=>prom.featured)[0]}
+                promosLoading = {this.props.promotions.isLoading}
+                promosErrMess={this.props.promotions.errMess}
                 leader={this.props.leaders.filter((leader)=>leader.featured)[0]}
             />
         );
@@ -58,8 +96,12 @@ class Main extends Component {
 
     const DishWithID = ({match,location,history})=>{
         return(
-            <DishDetail  dish={this.props.dishes.filter((dish)=>dish.id===parseInt(match.params.dishID,10))[0]} 
-                comments={this.props.comments.filter((comment)=>comment.dishId===parseInt(match.params.dishID,10))}
+            <DishDetail  dish={this.props.dishes.dishes.filter((dish)=>dish.id===parseInt(match.params.dishID,10))[0]} 
+                comments={this.props.comments.comments.filter((comment)=>comment.dishId===parseInt(match.params.dishID,10))}
+                postComment={this.props.postComment}
+                commentsErrMess = {this.props.comments.errMess}
+                dishesLoading = {this.props.dishes.isLoading}
+                dishesErrMess={this.props.dishes.errMess}
             />
         );
     }
@@ -69,8 +111,8 @@ class Main extends Component {
         <Header />
         <Switch>
             <Route path="/home" component={HomePage} />
-            <Route exact path="/menu" component={()=><Menu dishes={this.props.dishes}/>} /> 
-            <Route exact path="/contactus" component ={Contact} />
+            <Route exact path="/menu" component={()=><Menu dishes={this.props.dishes} />} /> 
+            <Route exact path="/contactus" component ={()=><Contact resetFeedbackForm={this.props.resetFeedbackForm}/> }/>
             <Route path="/menu/:dishID" component={DishWithID} />
             <Route path="/aboutus" component={()=><About leaders={LEADERS} />} />
             <Redirect to="/home" />
@@ -83,4 +125,4 @@ class Main extends Component {
   }
 }
 
-export default withRouter(connect(mapStateToProps)(Main));
+export default withRouter(connect(mapStateToProps,mapDispatchToProps)(Main));
